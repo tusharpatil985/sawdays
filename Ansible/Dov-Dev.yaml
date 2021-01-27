@@ -1,0 +1,32 @@
+---
+- name: Deploy Petclinic Application
+  hosts: Dev
+
+  tasks:
+
+     - name: Remove the old .war file from the destination folder
+       file:
+         state: absent
+         path: /opt/docker/deploy/petclininc*
+
+     - name: Copy the newly created .war file into the destination folder
+       copy:
+         src: /opt/jenkins/workspace/Petclinic/target/petclinic.war
+         dest: /opt/docker/deploy/
+         
+     - name: Remove the old image
+       command: docker image rm -f tusharpatil985/proctorexam
+
+     - name: Build the image
+       command: docker build -t tusharpatil985/proctorexam .
+       args:
+         chdir: /opt/docker/deploy
+
+     - name: Pushing the image to the central repository
+       command: docker push tusharpatil985/proctorexam
+
+     - name: Removing the old docker container
+       command: docker container rm -f proctorexam
+
+     - name: Create docker container to run Tomcat server
+       command: docker run -d -p 32000:8080 --name proctorexam tusharpatil985/proctorexam:latest
