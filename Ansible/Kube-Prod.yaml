@@ -1,0 +1,15 @@
+---
+- name: Deploy Petclinic Application
+  hosts: prod
+
+  tasks:
+
+    - name: Run the deployment file
+      command: kubectl apply -f deployment.yaml
+      args:
+        chdir: /opt/cluster
+
+    - name: Run the service file
+      command: kubectl apply -f service.yaml
+      args:
+        chdir: /opt/cluster
