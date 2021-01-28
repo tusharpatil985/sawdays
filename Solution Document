@@ -1,0 +1,63 @@
+Assessment Solution for Sawdays - DevOps
+
+Project Query: Develop the CICD pipeline which will be having the following properties.
+1.)	Should have local development, testing and production environment.
+2.)	Code should be source controlled.
+3.)	Changes should be tested in all environments.
+4.)	Features involving integrations should have tests done against those integrations.
+5.)	There should be ZERO outage during production deployments.
+6.)	Should always consider the AWS well architected principles.
+
+IDEAL CICD pipeline from my prospective. Kindly follow the below points.
+Section A: VPC Creation
+Creating a customized VPC to ensure the CICD pipeline tools will have proper networking and adequate security. 
+1.)	We will create a customized VPC for this solution where I will be incorporating it with Public, Private subnets, Modifying route tables, Defining security groups and NACL. 
+2.)	We will create IAM role with permission to access resources and enabling MFA, to provide additional security layer to our resources.
+3.)	We will create AWS EKS cluster in this VPC by defining VPC ID and Subnet IDs.
+Section B: Source controlled for Code – Git
+Here we will introduce the source controlled system such as GitHub (In our case) to store the codes in repositories.
+1.)	We create a repository which will have the java code.
+2.)	We will define two branches – Master and Review.
+3.)	Developers should clone this repository on their local systems and push the developed codes into Review branch.
+4.)	Lead code developer will check the code and can push it on Master branch.
+Section C: Introduction of Jenkins
+For this project, We will be using Jenkins for the Continuous Integration tool.
+1.)	Here we will create a job where it can pull the java code from the master branch of our repository.
+2.)	Before doing this we need to follow some steps to configure the Jenkins and we will follow the some best practices.
+a.	First of all, we will add Jenkins Worker node on which the actual job would be running. 
+b.	As Jenkins is written in java, we have to make sure that Master Jenkins server and Worker Jenkins server should have java installed.
+c.	As the job would be running on Jenkins worker node, Maven should be downloaded on that as here our code is written in java. So we would require maven to perform unit tests on the code, compile and package the code.
+d.	Now, we need to go to the “global tool configuration” and configure the path for java and maven.
+Section D: Set up Ansible and EKS cluster
+1.)	Here we will install Ansible on the Jenkins worker node to work as a continuous deployment purpose.
+2.)	We will write the script for the creation of EKS cluster in Terraform. We can plan and apply the script. 
+3.)	Then a local machine or any VM can take the control of EKS cluster by “aws eks –region “x” update-kubeconfig –name “x”” command and the same machine will work as worker node for Ansible. 
+4.)	The simple playbook will be written where we will mention the following steps in YAML format.
+a.	Firstly we will write the Dockerfile and with .war file which is generated as a output of maven build stage, we will create the image.
+b.	Then we will tag the image with our company’s hub.docker account and push it to central repository.
+c.	Ansible will run the deployment file and service file which are return in YAML formats.
+Section E: Setting up Selenium
+1.)	Install Selenium on VM running in AWS.
+2.)	Attach the test cases for the source java code.
+
+Section F: Create a JOB
+
+1.)	Now create a job “CICD for java application”. In that we need to mention the git source repository from where the source code will be pulled.
+2.)	We can set some build triggers like, job should be run every 5 mins or whenever there is a code push in master branch, job should be triggered. 
+3.)	In Build section: We should invoke the maven which will test, compile and package the java code and will generate .war file.
+4.)	Run the Selenium test cases to perform the functional testing the java code. We can even set the webhooks in Selenium which can be set to a particular percentage level for allowing the code to next steps.
+5.)	After words, ansible will play the playbook and perform the actions as mention above in Section D.
+Section G: Creating EKS through the Terraform script
+
+1.)	Create terraform script the run the EKS cluster where Master node is managed by the AWS and there will be two worker nodes of the “t3.large”.
+Section H: Run the Job “CICD for java application”
+1.)	 In this job, CICD pipeline triggers when there is “Code Push” in master branch happened. 
+2.)	 Code will be pulled from the git repo and followed the pipeline, starting with maven for testing, compiling and packaging purpose, Selenium would be triggered and performs the functional testing, ansible triggers the CD where deployment will happen first in docker environment which can be reviewed by the Manager and then finally application would be deployed in EKS cluster.
+3.)	I haven’t introduced Nagios in this pipeline but it can be included to put the artificial load on application and gather the artifacts.
+
+Supporting YAML scripts can be found in the below Git Repo. 
+You will also get the solution diagram for the better understanding of the CICD pipeline.
+
+https://github.com/tusharpatil985/sawdays.git
+
+
