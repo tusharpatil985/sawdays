@@ -15,18 +15,18 @@
          dest: /opt/docker/deploy/
          
      - name: Remove the old image
-       command: docker image rm -f tusharpatil985/proctorexam
+       command: docker image rm -f tusharpatil985/sawdays
 
      - name: Build the image
-       command: docker build -t tusharpatil985/proctorexam .
+       command: docker build -t tusharpatil985/sawdays .
        args:
          chdir: /opt/docker/deploy
 
      - name: Pushing the image to the central repository
-       command: docker push tusharpatil985/proctorexam
+       command: docker push tusharpatil985/sawdays
 
      - name: Removing the old docker container
-       command: docker container rm -f proctorexam
+       command: docker container rm -f sawdays
 
      - name: Create docker container to run Tomcat server
-       command: docker run -d -p 32000:8080 --name proctorexam tusharpatil985/proctorexam:latest
+       command: docker run -d -p 32000:8080 --name sawdays tusharpatil985/sawdays:latest
